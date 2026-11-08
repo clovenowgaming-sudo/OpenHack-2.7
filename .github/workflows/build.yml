@@ -12,16 +12,35 @@ jobs:
       matrix:
         config:
           - name: Android64
-            os: ubuntu-latest
             target: Android64
           - name: Android32
-            os: ubuntu-latest
             target: Android32
     name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the mod
+
+      - name: Build (attempt 1)
+        id: b1
+        continue-on-error: true
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: v5.11.2
+          combine: true
+          target: ${{ matrix.config.target }}
+
+      - name: Build (attempt 2)
+        id: b2
+        if: steps.b1.outcome == 'failure'
+        continue-on-error: true
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: v5.11.2
+          combine: true
+          target: ${{ matrix.config.target }}
+
+      - name: Build (attempt 3)
+        if: steps.b1.outcome == 'failure' && steps.b2.outcome == 'failure'
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: v5.11.2
