@@ -20,28 +20,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Use a local copy of the Geode build action, with ninja installed from apt
+      # (the original downloads it from a GitHub release, which sometimes returns 504)
+      - name: Prepare build action
+        run: |
+          git clone --depth 1 https://github.com/geode-sdk/build-geode-mod .github/actions/bgm
+          rm -rf .github/actions/bgm/.git .github/actions/bgm/examples
+          python3 - <<'PY'
+          p = ".github/actions/bgm/action.yml"
+          t = open(p).read()
+          old = (
+              '        curl -L https://github.com/ninja-build/ninja/releases/latest/download/ninja-${{ steps.platform.outputs.id }}.zip -o ninja.zip\n'
+              '        7z x ninja.zip -o"$GITHUB_WORKSPACE/ninja"\n'
+              '        echo "$GITHUB_WORKSPACE/ninja" >> $GITHUB_PATH\n'
+          )
+          new = '        sudo apt-get update -y && sudo apt-get install -y ninja-build\n'
+          assert old in t, "Install Ninja step not found"
+          open(p, "w").write(t.replace(old, new))
+          PY
+
       - name: Build (attempt 1)
         id: b1
         continue-on-error: true
-        uses: geode-sdk/build-geode-mod@main
+        uses: ./.github/actions/bgm
         with:
           sdk: v5.11.2
           combine: true
           target: ${{ matrix.config.target }}
 
       - name: Build (attempt 2)
-        id: b2
         if: steps.b1.outcome == 'failure'
-        continue-on-error: true
-        uses: geode-sdk/build-geode-mod@main
-        with:
-          sdk: v5.11.2
-          combine: true
-          target: ${{ matrix.config.target }}
-
-      - name: Build (attempt 3)
-        if: steps.b1.outcome == 'failure' && steps.b2.outcome == 'failure'
-        uses: geode-sdk/build-geode-mod@main
+        uses: ./.github/actions/bgm
         with:
           sdk: v5.11.2
           combine: true
