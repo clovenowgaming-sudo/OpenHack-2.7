@@ -1,0 +1,33 @@
+{
+	"geode": "5.11.2",
+	"gd": {
+		"android": "2.2081"
+	},
+	"version": "v2.7.0",
+	"id": "prevter.openhack",
+	"name": "OpenHack-2.7",
+	"developer": "Prevter, ported to GD 2.2081",
+	"description": "OpenHack port for Geometry Dash 2.2081 (Geode 5.11.2, Android). Tap the round floating OH button to open the menu.",
+	"repository": "https://github.com/YOUR_USERNAME/OpenHack-2.7",
+	"tags": [
+		"gameplay",
+		"cheats",
+		"utility"
+	],
+	"settings": {
+		"ui-scale": {
+			"name": "UI Scale",
+			"description": "Scale of the OpenHack menu and button (restart the menu by toggling the window).",
+			"type": "float",
+			"default": 1.8,
+			"min": 0.8,
+			"max": 4.0
+		},
+		"legacy-render": {
+			"name": "Use Legacy rendering",
+			"description": "Use OpenGL 2.0 instead of 3.0. Enable this if the menu renders incorrectly.",
+			"type": "bool",
+			"default": false
+		}
+	}
+}
